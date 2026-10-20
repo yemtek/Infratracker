@@ -1,0 +1,116 @@
+// Prisma schema for InfraTrack IT Infrastructure & Network Asset Management
+// Connected to Neon.tech PostgreSQL serverless instance
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Site {
+  id        String   @id @default(uuid())
+  name      String
+  location  String
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  racks     Rack[]
+
+  @@map("sites")
+}
+
+model Rack {
+  id        String   @id @default(uuid())
+  name      String
+  height    Int      @default(42)
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  devices   Device[]
+
+  @@map("racks")
+}
+
+model Device {
+  id           String      @id @default(uuid())
+  name         String
+  model        String
+  deviceType   String      @default("SERVER") // SERVER, SWITCH, PATCH_PANEL, BLADE_CHASSIS, CABLE_ORGANIZER, FIREWALL, PDU
+  serialNumber String      @unique
+  macAddress   String?
+  ipAddress    String?
+  startU       Int         // Starting Unit 1 to 42
+  unitHeight   Int         @default(1) // 1U to 8U
+  status       String      @default("ONLINE") // ONLINE, WARNING, CRITICAL, MAINTENANCE, PROVISIONING
+  powerWatts   Int         @default(350)
+  rackId       String
+  rack         Rack        @relation(fields: [rackId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  ports        Port[]
+
+  @@map("devices")
+}
+
+model Port {
+  id              String   @id @default(uuid())
+  portNumber      Int
+  portName        String?  // e.g., "ge-0/0/1", "eth1", "SFP+ 1"
+  portType        String   @default("CAT6") // CAT6, SINGLE_MODE_FIBER, MULTI_MODE_FIBER, SFP28, QSFP28
+  speedMbps       Int      @default(1000)
+  status          String   @default("UP") // UP, DOWN, DISABLED
+  deviceId        String
+  device          Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  connectedPortId String?  @unique
+  connectedTo     Port?    @relation("PortConnections", fields: [connectedPortId], references: [id])
+  connectedFrom   Port?    @relation("PortConnections")
+  vlanId          String?
+  vlan            VLAN?    @relation(fields: [vlanId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ports")
+}
+
+model VLAN {
+  id          String   @id @default(uuid())
+  vlanNumber  Int      @unique
+  name        String
+  description String?
+  colorHex    String   @default("#10b981")
+  subnet      String?  // e.g. "10.100.10.0/24"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ports       Port[]
+
+  @@map("vlans")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  role        String   @default("DC_TECH") // SUPER_ADMIN, NETWORK_ENGINEER, DC_TECH, READ_ONLY_AUDITOR
+  status      String   @default("ACTIVE") // ACTIVE, SUSPENDED, INVITED
+  permissions String[] @default([])
+  department  String?  @default("Datacenter Operations")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("users")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  category  String   // INVENTORY, CABLING, INFRASTRUCTURE, AUTH, SYSTEM
+  details   String
+  userEmail String   @default("admin@infratrack.io")
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}

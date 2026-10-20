@@ -1,0 +1,6 @@
+{
+  "name": "InfraTrack - IT Infrastructure & Network Asset Management",
+  "description": "Production-ready, responsive IT infrastructure and datacenter asset management platform featuring dynamic 42U rack elevation viewer, port-to-port cable tracing matrix, and hardware intake registry.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InfraTrack - IT Infrastructure &amp; Network Asset Management</title>
+    <meta name="description" content="Production-ready, responsive IT infrastructure and datacenter asset management platform featuring dynamic 42U rack elevation viewer, port-to-port cable tracing matrix, and hardware intake registry." />
+    <meta property="og:title" content="InfraTrack - IT Infrastructure &amp; Network Asset Management" />
+    <meta property="og:description" content="Production-ready, responsive IT infrastructure and datacenter asset management platform featuring dynamic 42U rack elevation viewer, port-to-port cable tracing matrix, and hardware intake registry." />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#090d16" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="InfraTrack" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        // Suppress Vite HMR WebSocket connection errors in cloud sandbox environment (HMR is disabled)
+        const OriginalWebSocket = window.WebSocket;
+        if (OriginalWebSocket) {
+          window.WebSocket = function(url, protocols) {
+            if (protocols === 'vite-hmr' || (typeof url === 'string' && (url.includes('vite-hmr') || url.includes('/@vite/client')))) {
+              const fakeWs = new EventTarget();
+              fakeWs.binaryType = 'blob';
+              fakeWs.readyState = 1; // WebSocket.OPEN
+              fakeWs.url = String(url);
+              fakeWs.protocol = 'vite-hmr';
+              fakeWs.extensions = '';
+              fakeWs.bufferedAmount = 0;
+              fakeWs.send = function() {};
+              fakeWs.close = function() {
+                fakeWs.readyState = 3; // CLOSED
+              };
+              setTimeout(function() {
+                fakeWs.dispatchEvent(new Event('open'));
+              }, 10);
+              return fakeWs;
+            }
+            return new OriginalWebSocket(url, protocols);
+          };
+          window.WebSocket.prototype = OriginalWebSocket.prototype;
+          window.WebSocket.CONNECTING = 0;
+          window.WebSocket.OPEN = 1;
+          window.WebSocket.CLOSING = 2;
+          window.WebSocket.CLOSED = 3;
+        }
+
+        // Suppress any stray console error from @vite/client
+        const origConsoleError = console.error;
+        console.error = function(...args) {
+          const str = args.map(function(a) { return (a && (a.message || a.stack)) || String(a); }).join(' ');
+          if (
+            str.includes('WebSocket closed without opened') ||
+            (str.includes('WebSocket') && str.includes('@vite/client'))
+          ) {
+            return;
+          }
+          return origConsoleError.apply(console, args);
+        };
+
+        window.addEventListener('error', function(event) {
+          if (
+            event &&
+            (event.message?.includes('WebSocket') ||
+             event.filename?.includes('@vite/client') ||
+             event.message?.includes('closed without opened'))
+          ) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+          if (
+            event &&
+            (event.reason?.message?.includes('WebSocket') ||
+             event.reason?.stack?.includes('@vite/client') ||
+             event.reason?.message?.includes('closed without opened'))
+          ) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
