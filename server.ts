@@ -708,11 +708,23 @@ app.delete('/api/vlans/:id', async (req, res) => {
 // 7. Seed / Reset Data
 app.post('/api/seed', async (req, res) => {
   try {
+    const userEmail = (req.body?.userEmail || req.query?.userEmail || '').trim();
+    if (!userEmail) {
+      return res.status(401).json({ error: 'Authentication required: guest visitors cannot reset enterprise data.' });
+    }
+
+    if (userEmail.toLowerCase() !== 'bossyemzee@gmail.com') {
+      const userRes = await pool.query('SELECT role, status FROM users WHERE LOWER(email) = LOWER($1)', [userEmail]);
+      if (userRes.rows.length === 0 || !['SUPER_ADMIN', 'ADMIN'].includes(userRes.rows[0].role) || userRes.rows[0].status !== 'ACTIVE') {
+        return res.status(403).json({ error: 'Forbidden: Only administrators can reset the demo database.' });
+      }
+    }
+
     await seedDatabase();
     await pool.query(`
       INSERT INTO audit_logs (id, action, category, details, user_email)
-      VALUES ($1, 'FACTORY_RESET_AND_SEED', 'SYSTEM', 'Enterprise demonstration assets restored to all racks', 'bossyemzee@gmail.com')
-    `, [`log-${Date.now().toString(36)}`]);
+      VALUES ($1, 'FACTORY_RESET_AND_SEED', 'SYSTEM', 'Enterprise demonstration assets restored to all racks', $2)
+    `, [`log-${Date.now().toString(36)}`, userEmail]);
     res.json({ message: 'Database reset and populated with enterprise equipment seed!' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

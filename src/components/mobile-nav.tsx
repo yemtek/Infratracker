@@ -363,14 +363,17 @@ export function MobileNav({
                 )}
               </div>
 
-              <button
-                onClick={onReseedData}
-                disabled={isReseeding}
-                className="w-full min-h-[38px] px-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-emerald-400' : ''}`} />
-                {isReseeding ? 'Resetting...' : 'Reset Demo Seeds'}
-              </button>
+              {/* Only show Reset Demo Seeds to authenticated administrators; hidden from guest users */}
+              {Boolean(currentUserEmail && isAdminGranted) && (
+                <button
+                  onClick={onReseedData}
+                  disabled={isReseeding}
+                  className="w-full min-h-[38px] px-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-emerald-400' : ''}`} />
+                  {isReseeding ? 'Resetting...' : 'Reset Demo Seeds'}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -579,15 +582,18 @@ export function MobileNav({
             <span className="text-emerald-400 font-bold">{dbStatus?.latencyMs || 24}ms</span>
           </div>
 
-          <button
-            onClick={onReseedData}
-            disabled={isReseeding}
-            className="w-full min-h-[38px] px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-            title="Reset to factory enterprise demo seed"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-emerald-400' : ''}`} />
-            {isReseeding ? 'Resetting...' : 'Reset Demo Seeds'}
-          </button>
+          {/* Only show Reset Demo Seeds to authenticated administrators; hidden from guest users */}
+          {Boolean(currentUserEmail && isAdminGranted) && (
+            <button
+              onClick={onReseedData}
+              disabled={isReseeding}
+              className="w-full min-h-[38px] px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              title="Reset to factory enterprise demo seed"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-emerald-400' : ''}`} />
+              {isReseeding ? 'Resetting...' : 'Reset Demo Seeds'}
+            </button>
+          )}
         </div>
       </aside>
     </>

@@ -305,9 +305,17 @@ export default function App() {
 
   // Reseed enterprise database
   const handleReseedData = async () => {
+    if (!isAdminGranted || !currentUserEmail) {
+      showToast('Unauthorized: Administrator access required to reset demo seeds', 'error');
+      return;
+    }
     setIsReseeding(true);
     try {
-      const res = await fetch('/api/seed', { method: 'POST' });
+      const res = await fetch('/api/seed', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail: currentUserEmail })
+      });
       if (res.ok) {
         await loadAllData();
         if (selectedRackId) {
